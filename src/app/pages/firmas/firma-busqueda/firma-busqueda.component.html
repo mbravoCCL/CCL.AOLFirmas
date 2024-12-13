@@ -1,0 +1,63 @@
+<div style="display: flex; align-items: center;">
+    <mat-icon class="colorcclsecondary me-1">filter_list</mat-icon>
+    <h5 class="colorcclprimary" style="margin: 0;">Filtros</h5>
+</div>
+<mat-divider class="mt-4 mb-2"></mat-divider>
+<div class="mb-3">
+    <label class="form-label colorcclprimary" style="display: flex; align-items: center;">
+      <mat-icon class="colorcclsecondary me-1">description</mat-icon>
+      Tipo de Documento
+    </label>
+    <div>
+      <mat-checkbox
+        color="primary"
+        [value]="'Laudo'"
+        (change)="toggleTipoDocumento('Laudo', $event.checked)"
+      >
+        Laudo
+      </mat-checkbox>
+    </div>
+    <div>
+      <mat-checkbox
+        color="primary"
+        [value]="'Notificación'"
+        (change)="toggleTipoDocumento('Notificación', $event.checked)"
+      >
+        Notificación
+      </mat-checkbox>
+    </div>
+    <div>
+      <mat-checkbox
+        color="primary"
+        [value]="'Oficio'"
+        (change)="toggleTipoDocumento('Oficio', $event.checked)"
+      >
+        Oficio
+      </mat-checkbox>
+    </div>
+    <div>
+      <mat-checkbox
+        color="primary"
+        [value]="'Orden Procesal'"
+        (change)="toggleTipoDocumento('Orden Procesal', $event.checked)"
+      >
+        Orden Procesal
+      </mat-checkbox>
+    </div>
+  </div>
+  
+<mat-divider class="mt-2 mb-2"></mat-divider>
+<div class="mb-3">
+    <label class="form-label colorcclprimary" style="display: flex; align-items: center;">
+        <mat-icon class="colorcclsecondary me-1">history</mat-icon>
+        Historico
+    </label>
+    <div>
+        <mat-checkbox color="primary"  (change)="toggleHistorico($event.checked)">Mostrar Documentos Firmados</mat-checkbox>
+    </div>
+</div>
+<mat-divider class="mt-2 mb-2"></mat-divider>
+<button mat-fab extended class="mb-3" color="primary" style="width: 100%;" (click)="aplicarFiltro()">
+    <mat-icon>search</mat-icon>
+    Buscar
+</button>

@@ -1,0 +1,82 @@
+
+<div class="d-flex align-items-center mt-5 justify-content-around">
+    <button mat-fab extended class="mb-3" color="primary" (click)="firmar()">
+        <mat-icon>draw</mat-icon>
+        Firmar
+      </button>
+  <mat-form-field>
+    <mat-label>Búsqueda</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ejm. Caso-001">
+  </mat-form-field>
+
+</div>
+ 
+  @if(dataSource.data.length > 0){
+  <table mat-table [dataSource]="dataSource" matSort>
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()" color="primary"
+                        >
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+            <mat-checkbox 
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="row.estado === 1 || selection.isSelected(row)" 
+            [disabled]="row.estado === 1" 
+            color="primary">
+          </mat-checkbox>
+        
+        </td>
+      </ng-container>
+  
+   
+    <ng-container matColumnDef="pdf">
+      <th mat-header-cell *matHeaderCellDef> Visualizar </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-icon style="color: red;">picture_as_pdf</mat-icon>
+      </td>
+    </ng-container>
+  
+
+    <ng-container matColumnDef="nroCaso">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Número de Caso </th>
+      <td mat-cell *matCellDef="let element"> {{element.nroCaso}} </td>
+    </ng-container>
+  
+   
+    <ng-container matColumnDef="tipoFirma">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de Firma </th>
+      <td mat-cell *matCellDef="let element"> {{element.tipoFirma}} </td>
+    </ng-container>
+  
+  
+    <ng-container matColumnDef="tipoDocumento">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de Documento </th>
+      <td mat-cell *matCellDef="let element"> {{element.tipoDocumento}} </td>
+    </ng-container>
+  
+  
+    <ng-container matColumnDef="fechaSolicitud">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Solicitud </th>
+      <td mat-cell *matCellDef="let element"> {{element.fechaSolicitud | date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="fechaFirma">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Firma </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaFirma | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  
+  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+}@else{
+    <div class="alert alert-primary" role="alert">
+       No se encontraron documentos por firmar.
+    </div>
+}

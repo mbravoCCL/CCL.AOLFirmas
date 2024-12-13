@@ -1,0 +1,30 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$pp: mat.define-palette(mat.$indigo-palette);
+$primary: mat.get-color-from-palette($pp);
+$ap: mat.define-palette(mat.$pink-palette);
+$accent: mat.get-color-from-palette($ap);
+$wp: mat.define-palette(mat.$red-palette);
+$warn: mat.get-color-from-palette($wp);
+
+$theme: mat.define-light-theme((
+ color: (
+   primary: $pp,
+   accent: $ap,
+   warn: $wp,
+ ),
+ typography: mat.define-typography-config(),
+));
+
+@include mat.all-component-themes($theme);
+
+
+.colorcclprimary {
+    color: #0e4597 !important;
+}
+
+.colorcclsecondary {
+    color: #fdd33f !important;
+}

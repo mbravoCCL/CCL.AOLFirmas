@@ -1,0 +1,64 @@
+.header {
+    background: linear-gradient(31deg, #0e4597, #0e4597);
+    color: #ffffff;
+    padding: 20px 30px 20px 0px;
+    display: flex;
+    align-items: space;
+    justify-content: space-between;
+ 
+  }
+  .header img.logo {
+    width: 200px;
+    height: auto;
+    margin-left: 20px;
+  }
+
+
+  .header .title {
+    font-size: 2.4rem;
+    letter-spacing: 0.5px;
+    margin-top: 0;
+    line-height: 1.2;
+    color: #f2a505;
+ 
+  }
+
+
+  .profile-menu {
+    position: absolute;
+    top: 100%; /* Justo debajo del avatar */
+    left: 50%; /* Alineado al centro del avatar */
+    transform: translateX(-50%); /* Ajusta para centrar */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 200px;
+    z-index: 1000;
+  }
+  
+  .profile-menu p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+  }
+  
+  .profile-menu button {
+    width: 100%;
+    background-color: #067906;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  .profile-menu button:hover {
+    background-color: #045d05;
+  }
+  
+  /* Opcional: Evitar que el contenedor se expanda */
+  .container-fluid {
+    overflow: hidden;
+  }
+  
