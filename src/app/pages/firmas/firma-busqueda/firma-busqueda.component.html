@@ -11,17 +11,17 @@
     <div>
       <mat-checkbox
         color="primary"
-        [value]="'Laudo'"
-        (change)="toggleTipoDocumento('Laudo', $event.checked)"
+        [value]="'RESOLUCIÓN'"
+        (change)="toggleTipoDocumento('RESOLUCIÓN', $event.checked)"
       >
-        Laudo
+        Resolución
       </mat-checkbox>
     </div>
     <div>
       <mat-checkbox
         color="primary"
-        [value]="'Notificación'"
-        (change)="toggleTipoDocumento('Notificación', $event.checked)"
+        [value]="'NOTIFICACIÓN'"
+        (change)="toggleTipoDocumento('NOTIFICACIÓN', $event.checked)"
       >
         Notificación
       </mat-checkbox>
@@ -29,19 +29,19 @@
     <div>
       <mat-checkbox
         color="primary"
-        [value]="'Oficio'"
-        (change)="toggleTipoDocumento('Oficio', $event.checked)"
+        [value]="'ACTA'"
+        (change)="toggleTipoDocumento('ACTA', $event.checked)"
       >
-        Oficio
+        Acta
       </mat-checkbox>
     </div>
     <div>
       <mat-checkbox
         color="primary"
-        [value]="'Orden Procesal'"
-        (change)="toggleTipoDocumento('Orden Procesal', $event.checked)"
+        [value]="'ESCRITO'"
+        (change)="toggleTipoDocumento('ESCRITO', $event.checked)"
       >
-        Orden Procesal
+        Escrito
       </mat-checkbox>
     </div>
   </div>
@@ -50,7 +50,7 @@
 <div class="mb-3">
     <label class="form-label colorcclprimary" style="display: flex; align-items: center;">
         <mat-icon class="colorcclsecondary me-1">history</mat-icon>
-        Historico
+       Histórico
     </label>
     <div>
         <mat-checkbox color="primary"  (change)="toggleHistorico($event.checked)">Mostrar Documentos Firmados</mat-checkbox>

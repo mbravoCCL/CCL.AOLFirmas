@@ -1,0 +1,66 @@
+<div class="container-fluid vh-100" style="overflow:hidden">
+    <div class="row h-100">
+    
+     
+        <div class="col-9 p-0 d-none d-md-block background-image">
+            <img 
+        src="fondofirmaaol.jpg" 
+        class="img-fluid" 
+        alt="Background Image" />
+          </div>
+  
+    
+      <div class="col-12 col-md-3 d-flex flex-column justify-content-center align-items-center shadow p-4">
+        
+       
+        <div class="mb-4 w-100 d-flex flex-column justify-content-center align-items-center">
+          
+            <img src="cda.png" alt="Logo" class="logo" style="max-width: 80%; height: auto;">
+            <h5 class="colorcclprimary text-center">Sistema de Firma de Documentos</h5>
+          </div>
+          
+      
+       
+        <form [formGroup]="loginForm" class="w-100">
+          
+        
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>Usuario</mat-label>
+            <input matInput type="text" formControlName="userName" placeholder="Ingresar Usuario">
+            <mat-error *ngIf="loginForm.controls['userName'].invalid && loginForm.controls['userName'].touched">
+              Por favor ingresar usuario.
+            </mat-error>
+          </mat-form-field>
+  
+         
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Ingresar Contraseña">
+            <mat-error *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched">
+              Por favor ingresar contraseña
+            </mat-error>
+          </mat-form-field>
+  
+         
+          <div class="d-grid mb-2 mt-3">
+            <button mat-fab extended color="primary" class="mb-3 w-100" (click)="login()">
+              <mat-icon>login</mat-icon>
+               Ingresar
+            </button>
+          </div>
+
+        
+          <div class="d-grid">
+            <button mat-fab extended color="warn" class="w-100" (click)="oauthLogin()">
+              <mat-icon>email</mat-icon>
+              Ingresar con OAuth
+            </button>
+          </div>
+  
+        </form>
+  
+      </div>
+  
+    </div>
+  </div>
+  

@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-full',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  templateUrl: './full.component.html',
+  styleUrl: './full.component.scss'
 })
-export class AppComponent {
-  title = 'CCL.AOLFirmas';
+export class FullComponent {
+
 }

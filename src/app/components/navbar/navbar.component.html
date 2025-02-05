@@ -1,4 +1,15 @@
 <div class="container-fluid header text-center">
-    <img src="Simple_LogoArbitraje_White.svg"  class="logo" > 
-    <ngx-avatars   [bgColor]="'#CDE4CD'" fgColor="#067906" borderColor="#067906" name="Freddy Rachumi" ></ngx-avatars>
+    <img src="Simple_LogoArbitraje_White.svg" class="logo">
+   <div style="cursor: pointer;"><ngx-avatars [bgColor]="'#CDE4CD'" fgColor="#067906"
+            borderColor="#067906" [name]="username"[matMenuTriggerFor]="menu" ></ngx-avatars></div>
+    <mat-menu #menu="matMenu" >
+        <button mat-menu-item (click)="openConfigDialog()"> 
+            <mat-icon>settings</mat-icon> Configuración
+        </button>
+        
+      
+        <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon> Cerrar Sesión
+        </button>
+    </mat-menu>
 </div>

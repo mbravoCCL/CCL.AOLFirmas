@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>
+    <div style="display: flex; align-items: center;">
+        <mat-icon class="colorcclsecondary " style="margin-right: 8px;">double_arrow</mat-icon>
+        <h4 class="colorcclprimary" style="margin: 0;">Configuración</h4>
+    </div>
+</h2>
+<mat-dialog-content>
+    <form [formGroup]="configForm">
+
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Certificado PFX</label>
+            <input class="form-control" type="file" formControlName="pfx" (change)="onFileChangePFX($event)">
+            <mat-error *ngIf="configForm.controls['pfx'].touched &&  configForm.controls['pfx'].hasError('required')" class="text-danger">Este campo es
+                obligatorio</mat-error>
+        </div>
+
+        <div class="mb-3">
+            <mat-form-field appearance="fill" class="w-100">
+                <mat-label>Contraseña</mat-label>
+                <input matInput type="password" formControlName="password">
+                <mat-error *ngIf="configForm.controls['password'].touched &&  configForm.controls['password'].hasError('required')" class="text-danger">Este campo
+                    es obligatorio</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="">
+            <label for="formFile" class="form-label">Imagen Firma</label>
+            <input class="form-control" type="file" formControlName="firma" (change)="onFileChangeFirma($event)">
+            <mat-error *ngIf="configForm.controls['firma'].touched && configForm.controls['firma'].hasError('required')" class="text-danger">Este campo es
+                obligatorio</mat-error>
+        </div>
+
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-fab extended  color="warn" (click)="cancel()" >Cancelar</button>
+    <button mat-fab extended  (click)="save()" color="primary" cdkFocusInitial>Guardar</button>
+</mat-dialog-actions>
+

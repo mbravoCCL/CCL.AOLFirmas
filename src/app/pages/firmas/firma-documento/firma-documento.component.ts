@@ -15,6 +15,12 @@ import { FirmaStorageService } from '../../../service/firma-storage.service';
 import { Subscription } from 'rxjs';
 import { FiltrosFirmaService } from '../../../service/filtros-firma.service';
 import { FiltroFirma } from '../../../interface/FiltroFirma';
+import { FirmaService } from '../../../service/firma.service';
+import { AuthService } from '../../../service/auth.service';
+import { FirmaDocumentoRequest } from '../../../interface/request/FirmaDocumentoRequest';
+import { FirmaDocumentosRequest } from '../../../interface/request/FirmaDocumentosRequest';
+import { MatDialog } from '@angular/material/dialog';
+import { FirmaPasswordComponent } from '../firma-password/firma-password.component';
 
 
 const TIPOS_FIRMA: string[] = ['Conjunta', 'Individual'];
@@ -30,56 +36,83 @@ const NROS_CASO: string[] = ['C001-2024-CCL', 'C002-2024-CCL', 'C003-2024-CCL', 
 })
 export class FirmaDocumentoComponent  implements OnInit, OnDestroy, AfterViewInit {
   displayedColumns: string[] = ['select', 'pdf', 'nroCaso', 'tipoFirma', 'tipoDocumento', 'fechaSolicitud','fechaFirma'];
-  dataSource: MatTableDataSource<Firma>;
+  dataSource!: MatTableDataSource<Firma>;
   selection = new SelectionModel<Firma>(true, []);
   private paginator!: MatPaginator;
   private sort!: MatSort;
   private subscription!: Subscription;
   _filtrosService = inject(FiltrosFirmaService);
-  
+  _firmaService = inject(FirmaService);
+ _authService = inject(AuthService);
+ _dialogFirmaPassword = inject(MatDialog);
+
   filtros: FiltroFirma = {
     tiposDocumento: [] , 
     historico: 0
   };
   
   constructor() {
-    
-    let firmas = FirmaStorageService.getFirmas();
-    if (firmas.length === 0) {
-      firmas = Array.from({ length: 20 }, (_, k) => createNewFirma(k + 1));
-      FirmaStorageService.saveFirmas(firmas); 
-    }
-
-    firmas = firmas.filter(
-      (doc) => doc.estado !== 1
-    );
-    this.dataSource = new MatTableDataSource(firmas);
   }
 
   ngOnInit(): void {
+    this.listarDocumentosPorUsuario();
     this.subscription = this._filtrosService.filtros$.subscribe((filtros) => {
       this.filtros = filtros;
       this.aplicarFiltros(filtros);
     });
   }
 
+
+  listarDocumentosPorUsuario(){
+    var filtro = {
+      "idUsuario": this._authService.getIdUserFromLocalStorage(),
+      "incluyeHistorico": false
+    }
+
+       this._firmaService.ListadoDocumentosPorUsuario(filtro).subscribe({
+          next: (response: Firma[]) => {
+            this.dataSource = new MatTableDataSource(response);
+          },
+          error: (error: any) => {
+            
+          }
+        });
+  }
+
   aplicarFiltros(filtros: any) {
-    let dataFilter = FirmaStorageService.getFirmas().filter((doc) => {
-      return (
-        (!filtros.tiposDocumento || filtros.tiposDocumento.length === 0 || filtros.tiposDocumento.includes(doc.tipoDocumento))
-      );
+    
+
+    var filtro = {
+      "idUsuario": this._authService.getIdUserFromLocalStorage(),
+      "incluyeHistorico": filtros.historico === 1 ?true :false
+    }
+
+       this._firmaService.ListadoDocumentosPorUsuario(filtro).subscribe({
+          next: (response: Firma[]) => {
+            this.dataSource = new MatTableDataSource(response);
+            
+            let dataFilter = this.dataSource.data.filter((doc) => {
+              return (
+                (!filtros.tiposDocumento || filtros.tiposDocumento.length === 0 || filtros.tiposDocumento.includes(doc.tipoDocumento))
+              );
+            });
+        
+            if (filtros.historico === 1) {
+              dataFilter = dataFilter.filter((doc) => doc.fechaFirma != null || doc.fechaFirma == null);
+            }
+        
+            if (filtros.historico === 0) {
+              dataFilter = dataFilter.filter((doc) => doc.fechaFirma == null);
+            }
+        
+            this.dataSource = new MatTableDataSource(dataFilter);
+            this.setDataSourceAttributes();
+          },
+          error: (error: any) => {
+            
+          }
     });
 
-    if (filtros.historico === 1) {
-      dataFilter = dataFilter.filter((doc) => doc.fechaFirma != null || doc.fechaFirma == null);
-    }
-
-    if (filtros.historico === 0) {
-      dataFilter = dataFilter.filter((doc) => doc.fechaFirma == null);
-    }
-
-    this.dataSource = new MatTableDataSource(dataFilter);
-    this.setDataSourceAttributes();
   }
 
   ngAfterViewInit() {
@@ -116,92 +149,171 @@ export class FirmaDocumentoComponent  implements OnInit, OnDestroy, AfterViewIni
   }
   
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    this.paginator = mp;
-    this.paginator._intl!.itemsPerPageLabel="Registros por página";
-    this.setDataSourceAttributes();
+    if(this.dataSource){
+      this.paginator = mp;
+      this.paginator._intl!.itemsPerPageLabel="Registros por página";
+      this.setDataSourceAttributes();
+    }
+
   }
   
   setDataSourceAttributes() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    if(this.dataSource){
+      this.dataSource.paginator = this.paginator;
+      this.dataSource!.sort = this.sort;
+    }
+  
   }
 
   firmar() {
-    
-    let pendientesdeFirma = this.selection.selected.filter( x => x.estado == 0);
-
+    let pendientesdeFirma = this.selection.selected;
+  
     if (pendientesdeFirma.length == 0) {
       Swal.fire({
         icon: "error",
-        text: "No hay elementos seleccionado",
+        text: "No hay elementos seleccionados",
       });
       return;
     }
-   
-
-    Swal.fire({
-      text: "¿Está seguro de proceder con la firma para los  "+ pendientesdeFirma.length +" documentos seleccionados?",
-      showCancelButton: true,
-      icon: "warning",
-      confirmButtonText: "Guardar",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#0e4597",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-
-        pendientesdeFirma.forEach((documento) => {
-          documento.estado = 1; 
-          documento.fechaFirma = new Date();
-        });
   
-       
-        const documentosActuales = FirmaStorageService.getFirmas();
+    const configUser = this._authService.getConfigUserFromLocalStorage();
 
-        
-        const documentosActualizados = documentosActuales.map((doc) =>
-          pendientesdeFirma.some((pendiente) => pendiente.id === doc.id)
-            ? { ...doc, estado: 1, fechaFirma: new Date() }
-            : doc
-        );
+    if(!configUser?.certificadoCargado){
+      Swal.fire("Advertencia", "No tiene un certificado digital cargado.", "warning");
+      return;
+    }
+    
+    if (configUser.contraseniaCertificadoCargada) {
+      this.procederConFirma(pendientesdeFirma, null);
+    } else {
+      this.openDialogFirmaPassword();
+    }
+  }
+
+  procederConFirma(pendientesdeFirma: Firma[], contraseniaFirma: string | null){
+    let msg = "";
+    let msgOk = "";
+
+    if (pendientesdeFirma.length == 1) {
+      msg = "¿Está seguro de proceder con la firma para el documento seleccionado?";
+      msgOk = "El documento ha sido firmado.";
       
-        
-        localStorage.setItem('firmas', JSON.stringify(documentosActualizados));
-        
-        this.aplicarFiltros(this.filtros);
-   
-        
-        this.selection.clear();
-        pendientesdeFirma = [];
+    
+      const firmaRequest: FirmaDocumentoRequest = {
+        idUsuario: this._authService.getIdUserFromLocalStorage(),
+        idDocumento: Number(this.selection.selected[0].id),
+      };
+  
+     
+      Swal.fire({
+        text: msg,
+        showCancelButton: true,
+        icon: "warning",
+        confirmButtonText: "Sí, Firmar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#0e4597",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._firmaService.firmarDocumento(firmaRequest).subscribe({
+            next: (result: boolean) => {
+              this.aplicarFiltros(this.filtros);
+              this.selection.clear();
+              pendientesdeFirma = [];
+  
+              Swal.fire("Guardado!", msgOk, "success");
+              this.listarDocumentosPorUsuario();
+            },
+            error: (error) => {
+              Swal.fire("Error", "Ha ocurrido un error al intentar firmar el documento.", "error");
+              console.log(error);
+            },
+          });
+        }
+      });
+  
+    } else {
+      msg = "¿Está seguro de proceder con la firma para los " + pendientesdeFirma.length + " documentos seleccionados?";
+      msgOk = "Los documentos han sido firmados.";
+  
+      
+      const firmaRequest: FirmaDocumentosRequest = {
+        idUsuario: this._authService.getIdUserFromLocalStorage(),
+        idDocumento: pendientesdeFirma.map(doc => doc.id)
+      };
+  
+      
+      Swal.fire({
+        text: msg,
+        showCancelButton: true,
+        icon: "warning",
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#0e4597",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._firmaService.firmarDocumentos(firmaRequest).subscribe({
+            next: (result: boolean) => {
+              this.aplicarFiltros(this.filtros);
+              this.selection.clear();
+              pendientesdeFirma = [];
+  
+              Swal.fire("Guardado!", msgOk, "success");
+              this.listarDocumentosPorUsuario();
+            },
+            error: (error) => {
+              Swal.fire("Error", "Ha ocurrido un error al intentar firmar los documentos.", "error");
+              console.log(error);
+            },
+          });
+        }
+      });
+    }
+  }
+  
+ openDialogFirmaPassword() {
+    const dialogRef = this._dialogFirmaPassword.open(FirmaPasswordComponent, {
+      width: '600px', 
+      data: {
+        title: 'Advertencia',
+        message: 'No se ha configurado una contraseña. Por favor, ingresa una contraseña para continuar con el proceso de firma del documento.'
+      }
+    });
 
-        Swal.fire("Guardado!", "Los documentos han sido firmados.", "success");
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== null) {
+        const contraseniafirma = result;
+       // this._authService.setContraseniaCertificadoCargada(true); 
+        this.procederConFirma(this.selection.selected, contraseniafirma);
+      } else {
+        console.log('Acción cancelada');
+      }
+    });
+  }
+
+  descargarPdf(firma: Firma): void {
+    this._firmaService.descargarPdf(firma.id).subscribe({
+      next: (pdfBlob: Blob) => {
+      
+        const link = document.createElement('a');
+        const url = window.URL.createObjectURL(pdfBlob);
+        link.href = url;
+        link.download = `${firma.nroCaso}_${firma.tipoDocumento}.pdf`; 
+        link.click();
+        window.URL.revokeObjectURL(url); 
+      },
+      error: (error) => {
+        console.error('Error al descargar el PDF:', error);
+      },
+      complete: () => {
+        console.log('La descarga ha finalizado.');
       }
     });
   }
   
+  
    ngOnDestroy() {
     this.subscription.unsubscribe(); 
   }
-}
-
-
-
-function createNewFirma(id: number): Firma {
-  const nroCaso = NROS_CASO[Math.floor(Math.random() * NROS_CASO.length)];
-  const tipoFirma = TIPOS_FIRMA[Math.floor(Math.random() * TIPOS_FIRMA.length)];
-  const tipoDocumento = TIPOS_DOCUMENTO[Math.floor(Math.random() * TIPOS_DOCUMENTO.length)];
-  const fechaSolicitud = new Date(
-    2024, 
-    Math.floor(Math.random() * 12), 
-    Math.floor(Math.random() * 28) + 1 
-  );
-
-  return {
-    id: id,
-    nroCaso: nroCaso,
-    tipoFirma: tipoFirma,
-    tipoDocumento: tipoDocumento,
-    estado: 0,
-    fechaSolicitud: fechaSolicitud
-  };
 }
